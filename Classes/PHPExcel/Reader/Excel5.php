@@ -3520,6 +3520,14 @@ class PHPExcel_Reader_Excel5 extends PHPExcel_Reader_Abstract implements PHPExce
             // offset: 6; size: 2; index to XF record for default column formatting
             $xfIndex = self::getInt2d($recordData, 6);
 
+            // See: https://github.com/PHPOffice/PHPExcel/issues/441
+            // if the default format index doesn't exist in the XF record, the worksheet/workbook default format
+            // at fixed index 15 should always exist and can be used as the default cell format as a last resort
+            if (!isset($this->mapCellXfIndex[$xfIndex]))
+            {
+                $xfIndex = 15;
+            }
+
             // offset: 8; size: 2; option flags
             // bit: 0; mask: 0x0001; 1= columns are hidden
             $isHidden = (0x0001 & self::getInt2d($recordData, 8)) >> 0;
